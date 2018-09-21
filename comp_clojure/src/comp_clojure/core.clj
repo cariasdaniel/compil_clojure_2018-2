@@ -11,13 +11,6 @@
   "I don't do a whole lot ... yet."
   [& args]
   (println "Hello, World!"))
-  
-(def as-and-bs
-	(insta/parser
-    "S = AB*;
-     AB = A | B;
-     A = 'a'+;
-     B = 'b'+;"))
 
 (def calc
 	(insta/parser
@@ -62,9 +55,3 @@
 	 
 (defn teste [x] (convert-pi x [] []))
 	
-(let [x [1 2 3]]
-  (match [x]
-    [[_ _ 2]] :a0
-    [[1 1 3]] :a1
-    [[1 2 3]] :a2
-    :else :a3))
