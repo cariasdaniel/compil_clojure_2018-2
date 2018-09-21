@@ -30,25 +30,27 @@
 	 div = term <'/'> factor;
 	 <factor> = digits | <'('> aexp <')'>;
 	 
-	 bexp = bool | <'~'> bexp | bexp boolop bool | aexp iop aexp;
-	 <boolop> = '=';
-	 <iop> = <'<'> | <'>'> | <'<='> | <'>='> | boolop;
+	 <bexp> = bool | not | eq | ls | le | gr | ge;
+	 not = <'~'> bexp;
+	 eq = bexp <'='> bool;
+	 ls = aexp <'<'> aexp;
+	 le = aexp <'<='> aexp;
+	 gr = aexp <'>'> aexp;
+	 ge = aexp <'>='> aexp;
 	 <bool> = <'('> bexp <')'> | boolean;
 	 boolean  = #'true' | #'false';
 	 digits = #'[0-9]+';"
 	 :output-format :hiccup))
-	 
-(defn parse [x] 
-	(do (->> (calc x)
-     (insta/transform
-       {:sum +, :sub -, :mul *, :div /,
-        :digits clojure.edn/read-string :exp identity})))) 
 		
-(defn convert-pi x 
-	(do (match x
+(defn convert-pi [x] 
+	(match x
 	 [:exp _] (convert-pi (second x))
-	 [:sum _] 
-
+	 [:sum _ _] (+ (convert-pi (get x 1) (get x 2)))
+	 [:num _] (get x 1)
+	 :else x))
+	 
+(defn teste [x] (convert-pi x [] []))
+	
 (let [x [1 2 3]]
   (match [x]
     [[_ _ 2]] :a0
