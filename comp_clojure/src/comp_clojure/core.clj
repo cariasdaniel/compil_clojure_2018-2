@@ -28,25 +28,36 @@
 	 <term> = factor |  mul | div;
 	 mul = term <'*'> factor;
 	 div = term <'/'> factor;
-	 <factor> = digits | <'('> aexp <')'>;
+	 <factor> = num | <'('> aexp <')'>;
 	 
 	 <bexp> = bool | not | eq | ls | le | gr | ge;
 	 not = <'~'> bexp;
-	 eq = bexp <'='> bool;
+	 eq = bexp <'='> bool | aexp <'='> aexp;
 	 ls = aexp <'<'> aexp;
 	 le = aexp <'<='> aexp;
 	 gr = aexp <'>'> aexp;
 	 ge = aexp <'>='> aexp;
 	 <bool> = <'('> bexp <')'> | boolean;
 	 boolean  = #'true' | #'false';
-	 digits = #'[0-9]+';"
+	 num = #'[0-9]+';"
 	 :output-format :hiccup))
 		
 (defn convert-pi [x] 
 	(match x
 	 [:exp _] (convert-pi (second x))
-	 [:sum _ _] (+ (convert-pi (get x 1) (get x 2)))
-	 [:num _] (get x 1)
+	 [:sum _ _] (+ (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:sub _ _] (- (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:mul _ _] (* (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:div _ _] (/ (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 
+	 [:eq _ _] (= (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:ls _ _] (< (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:le _ _] (<= (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:gr _ _] (> (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:ge _ _] (>= (convert-pi (get x 1)) (convert-pi (get x 2)))
+	 [:not _] (not (convert-pi (get x 1)))
+	 [:num _] (clojure.edn/read-string (get x 1))
+	 [:boolean _] (clojure.edn/read-string (get x 1))
 	 :else x))
 	 
 (defn teste [x] (convert-pi x [] []))
