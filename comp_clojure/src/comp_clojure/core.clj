@@ -23,35 +23,119 @@
 	 div = term <'/'> factor;
 	 <factor> = num | <'('> aexp <')'>;
 	 
-	 <bexp> = bool | not | eq | ls | le | gr | ge;
+	 <bexp> = bool | not | eq | lt | le | gt | ge;
 	 not = <'~'> bexp;
 	 eq = bexp <'='> bool | aexp <'='> aexp;
-	 ls = aexp <'<'> aexp;
+	 lt = aexp <'<'> aexp;
 	 le = aexp <'<='> aexp;
-	 gr = aexp <'>'> aexp;
+	 gt = aexp <'>'> aexp;
 	 ge = aexp <'>='> aexp;
 	 <bool> = <'('> bexp <')'> | boolean;
 	 boolean  = #'true' | #'false';
 	 num = #'[0-9]+';"
 	 :output-format :hiccup))
+	 
+(def ctr [])
+(def vl [])
+		 
+(defn popp [x] (x 0))
+				
+(defn pushp [a x] (into [] (cons a x)))
+
+(defn restp [x] (into [] (subvec x 1)))
+				  
+;;(defn evaluate [x] (convert-pi ctr vl))
 		
-(defn convert-pi [x] 
-	(match x
-	 [:exp _] (convert-pi (second x))
-	 [:sum _ _] (+ (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:sub _ _] (- (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:mul _ _] (* (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:div _ _] (/ (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 
-	 [:eq _ _] (= (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:ls _ _] (< (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:le _ _] (<= (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:gr _ _] (> (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:ge _ _] (>= (convert-pi (get x 1)) (convert-pi (get x 2)))
-	 [:not _] (not (convert-pi (get x 1)))
-	 [:num _] (clojure.edn/read-string (get x 1))
-	 [:boolean _] (clojure.edn/read-string (get x 1))
-	 :else x))
-	 
-(defn teste [x] (convert-pi x [] []))
+(defn convert-pi [ctr vl] 
+	(do (match ctr
+	 [:exp _] (convert-pi (ctr 1) vl)
+	 [:sum & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#SUM (subvec ctr 3)))) 
+					vl)
+	 [:sub & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#SUB (subvec ctr 3)))) 
+					vl)
+	 [:mul & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#MUL (subvec ctr 3)))) 
+					vl)
+	 [:div & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#DIV (subvec ctr 3)))) 
+					vl)
 	
+	 [:eq & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#EQ (subvec ctr 3)))) 
+					vl)
+	 [:lt & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#LT (subvec ctr 3)))) 
+					vl)
+	 [:le & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#LE (subvec ctr 3)))) 
+					vl)
+	 [:gt & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#GT (subvec ctr 3)))) 
+					vl)
+	 [:ge & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (ctr 2) (pushp :#GE (subvec ctr 3)))) 
+					vl)
+	 [:not & r] (convert-pi 
+					(into [] 
+						(concat (ctr 1) (pushp :#NOT (subvec ctr 2)))) 
+					vl)
+					
+	 [:num & r] (convert-pi 
+					(restp (restp ctr)) 
+					(pushp (clojure.edn/read-string (popp (restp ctr))) vl))
+	 [:boolean & r] (convert-pi 
+					(restp (restp ctr)) 
+					(pushp (clojure.edn/read-string (popp (restp ctr))) vl))
+					
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	 [:#SUM & r] (convert-pi 
+					(restp ctr) 
+					(pushp (+ (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#SUB & r] (convert-pi 
+					(restp ctr) 
+					(pushp (- (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#MUL & r] (convert-pi 
+					(restp ctr) 
+					(pushp (* (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#DIV & r] (convert-pi 
+					(restp ctr) 
+					(pushp (/ (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#EQ & r] (convert-pi 
+					(restp ctr) 
+					(pushp (= (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#LT & r] (convert-pi 
+					(restp ctr) 
+					(pushp (< (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#LE & r] (convert-pi 
+					(restp ctr) 
+					(pushp (<= (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#GT & r] (convert-pi 
+					(restp ctr) 
+					(pushp (> (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#GE & r] (convert-pi 
+					(restp ctr) 
+					(pushp (>= (popp (restp vl)) (popp vl)) (restp (restp vl))))
+	 [:#NOT & r] (convert-pi 
+					(restp ctr) 
+					(pushp (not (popp vl)) (restp vl)))
+	 :else (prn ctr vl))))
+	 
+(defn teste [x] (convert-pi x []))
+	
+(def x (calc "1+2+3"))
+
+(defn teste [] (pushp :ass x))
