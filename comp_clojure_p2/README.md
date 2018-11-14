@@ -18,8 +18,17 @@ Download from http://example.com/FIXME.
 FIXME: listing of options this app accepts.
 
 ## Examples
-
-...
+   let var z = 1 
+    in { 
+        let var y = 10 
+            in {
+                while (~(y==0)) 
+                    do {
+                    z:=z*y; 
+                    y:= y-1
+                    }
+                }
+        }
 
 ### Bugs
 
