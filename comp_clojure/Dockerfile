@@ -21,7 +21,7 @@ RUN mkdir -p $LEIN_INSTALL \
   && chmod 0755 $LEIN_INSTALL/lein \
   && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip \
   && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip.asc \
-  && gpg --keyserver pool.sks-keyservers.net --recv-key 2B72BF956E23DE5E830D50F6002AF007D1A7CC18 \
+  && gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-key 2B72BF956E23DE5E830D50F6002AF007D1A7CC18 \
   && echo "Verifying Jar file signature ..." \
   && gpg --verify leiningen-$LEIN_VERSION-standalone.zip.asc \
   && rm leiningen-$LEIN_VERSION-standalone.zip.asc \
@@ -31,8 +31,8 @@ RUN mkdir -p $LEIN_INSTALL \
 ENV PATH=$PATH:$LEIN_INSTALL
 ENV LEIN_ROOT 1
 
-COPY . /app
-
 # Install clojure 1.9.0 so users don't have to download it every time
 RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' > project.clj \
 && lein deps && rm project.clj
+
+COPY . /app
