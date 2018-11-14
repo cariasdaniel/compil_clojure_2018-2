@@ -8,9 +8,10 @@ Download from http://example.com/FIXME.
 
 ## Usage
 
-FIXME: explanation
-
-    $ java -jar comp_clojure-0.1.0-standalone.jar [args]
+    $ docker build -t my-clojure-app .
+    $ docker run -it --rm --name my-running-app my-clojure-app
+    
+    #app: lein repl
 
 ## Options
 
