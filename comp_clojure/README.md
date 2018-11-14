@@ -8,17 +8,27 @@ Download from http://example.com/FIXME.
 
 ## Usage
 
-FIXME: explanation
+    $ docker build -t my-clojure-app .
+    $ docker run -it --rm --name my-running-app my-clojure-app
 
-    $ java -jar comp_clojure-0.1.0-standalone.jar [args]
+#app: lein repl
 
-## Options
+Options
 
 FIXME: listing of options this app accepts.
+Examples
 
-## Examples
-
-...
+    let var z = 1 
+        in { 
+            let var y = 10 
+                in { 
+                    while (~(y==0)) 
+                        do { 
+                            z:=z*y; 
+                            y:= y-1 
+                        }
+                    } 
+            }
 
 ### Bugs
 
