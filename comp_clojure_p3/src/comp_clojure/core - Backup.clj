@@ -60,8 +60,6 @@
  
 (defn prninst [args] 
 	(do (prn (args 0)) (prn (args 1)) (prn (args 2)) (prn (args 3)) (prn (args 4)) (prn "---------")))
-	
-(defn _match [f a] (if (= 0 (count f)) {} (merge {((popp f) 1) [(popp a)]} (_match (restp f) (restp a)))))
 		
 (defn eval-pi [ctr vl env sto loc] 
 	(do (prninst [ctr vl env sto loc])(match ctr
@@ -116,11 +114,9 @@
 					(restp (restp ctr)) 
 					(pushp (clojure.edn/read-string (popp (restp ctr))) vl) 
 					env sto loc)
-	 [:id & r] 		(eval-pi 
+	 [:id & r] (eval-pi 
 					(restp (restp ctr)) 
-					(if (not (= clojure.lang.PersistentVector (type (env (popp (restp ctr)))))) 
-						(pushp (sto (env (popp (restp ctr)))) vl) 
-						(pushp ((env (popp (restp ctr))) 0) vl)) 
+					(pushp (sto (env (popp (restp ctr)))) vl) 
 					env sto loc)
 					
 	 [:loop & r] (eval-pi
@@ -141,10 +137,8 @@
 							(concat (ctr 1) (ctr 2) (subvec ctr 3)))
 						vl env sto loc)
 						
-	 [:blk & r]		(if (= ((ctr 1) 0) :bind) 
-							(eval-pi (into [] (concat (into [] (concat (ctr 1) [:#DEC])) (subvec ctr 3 ))) (pushp (ctr 2) (pushp loc vl)) env sto []) 
-							(eval-pi (into [] (concat (into [] (concat (ctr 1) [:#BLK])) (subvec ctr 3 ))) (pushp env vl) env sto []))
-						
+	 [:blk & r]		(eval-pi (into [] (concat (into [] (concat (ctr 1) [:#DEC])) (into [] (concat (ctr 2) (pushp :#BLK (subvec ctr 3 )))))) 
+						(pushp loc vl) env sto [])
 	 [:ref & r]		(eval-pi 
 						(into [] 
 							(concat (ctr 1) (pushp :#REF (subvec ctr 2)))) 
@@ -237,8 +231,8 @@
 						env sto loc)
 						
 	 [:#DEC & r] 	(eval-pi 
-						(into [] (concat (popp (restp vl)) (pushp :#BLK (restp ctr)))) 
-						(pushp env (restp (restp vl))) 
+						(restp ctr) 
+						(pushp env (restp vl)) 
 						(merge env (popp vl)) sto loc)
 						
 	 [:#BLK & r] 	(eval-pi 
@@ -249,25 +243,13 @@
 						(popp (restp vl)))
 						
 	 [:#CALL & r] 	(eval-pi 
-						(into [] (concat ((env ((ctr 1) 0)) 1) (subvec ctr 2))) 
-						(subvec vl ((ctr 1) 1)) 
-						(merge ((env ((ctr 1) 0)) 2) (_match (subvec ((env ((ctr 1) 0)) 0) 1 (+ 1 ((ctr 1) 1))) (subvec vl 0 ((ctr 1) 1)))) 
-						sto loc)
+						(into [] (concat ((env ((ctr 1) 0)) 0) ((env ((ctr 1) 0)) 1) (subvec ctr 2))) 
+						vl env sto loc)
 						
 	 :else [ctr vl env sto loc])))
 	 
-	;(def ctr [:#CALL ["teste" 5] :#BLK])
-	;(def vl [1 2 135 false 7 {} []])
-	;(def env {"teste" [[:formals [:id "x"] [:id "y"] [:id "z"] [:id "v"] [:id "w"]] [:blk [:bind [:id "y"] [:ref [:id "x"]]] [:assign [:id "y"] [:boolean "true"]]] {}]})
-	 
 (defn teste [args] 
   (prn (eval-pi args [] {} {} [])))
-	
-	; let var z = 0
-		; in
-		; let fn f(x, y) =
-			; z :=  x + y
-		; in f(10, 20)
 	
 ;(def x (calc "let var z = 1 in{ let var true = 10 in {while (not(true==0)) do {z:=z*true; true:= true-1}}}"))
 (def x (calc "let fn teste(x,y,z,v,w) = 
