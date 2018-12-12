@@ -1,10 +1,10 @@
 
 comp_clojure.core=> (teste (calc "let var z = 0 
-										in {
-											let fn f(x,y) = 
-												z := x+y 
-											in { 
-												f(10,20)}}"))
+					in {
+						let fn f(x,y) = 
+							z := x+y 
+						in { 
+							f(10,20)}}"))
 [:prog [:blk [:bind [:id "z"] [:ref [:num "0"]]] [:blk [:bind [:id "f"] [:abs [:
 formals [:id "x"] [:id "y"]] [:blk [:assign [:id "z"] [:sum [:id "x"] [:id "y"]]
 ]]]] [:call [:id "f"] [:actuals [:num "10"] [:num "20"]]]]]]
