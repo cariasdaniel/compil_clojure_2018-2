@@ -143,7 +143,7 @@
 						
 	 [:blk & r]		(if (= ((ctr 1) 0) :bind) 
 							(eval-pi (into [] (concat (into [] (concat (ctr 1) [:#DEC])) (subvec ctr 3 ))) (pushp (ctr 2) (pushp loc vl)) env sto []) 
-							(eval-pi (into [] (concat (into [] (concat (ctr 1) [:#BLK])) (subvec ctr 3 ))) (pushp env vl) env sto []))
+							(eval-pi (into [] (concat (into [] (concat (ctr 1) [:#BLK])) (subvec ctr 2 ))) (pushp env (pushp loc vl)) env sto []))
 						
 	 [:ref & r]		(eval-pi 
 						(into [] 
