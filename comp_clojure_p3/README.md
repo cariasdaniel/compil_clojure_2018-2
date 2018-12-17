@@ -1,16 +1,16 @@
+# comp_clojure
+
+FIXME: description
+
 ## Installation
 
-    $ curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > lein
-    $ sudo mkdir -p /usr/local/bin/
-    $ sudo mv lein /usr/local/bin/lein
-    $ sudo chmod a+x /usr/local/bin/lein
-    $ export PATH=$PATH:/usr/local/bin
+Download from http://example.com/FIXME.
 
 ## Usage
 
 FIXME: explanation
 
-    $ java -jar compiler-0.1.0-standalone.jar [args]
+    $ java -jar comp_clojure-0.1.0-standalone.jar [args]
 
 ## Options
 
