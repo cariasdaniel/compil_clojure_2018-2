@@ -8,9 +8,31 @@
 
 ## Usage
 
-FIXME: explanation
+À partir da pasta do projeto:
 
-    $ java -jar compiler-0.1.0-standalone.jar [args]
+    $ lein deps
+    $ lein repl
+    comp_clojure_p3$ (teste x)
+
+Este teste compila o programa: 
+    let fn teste(x,y,z,v,w) = 
+                            let var y = x 
+                                in {
+                                    y := true
+                                } 
+                            in {
+                                teste(1,2,3*45,false,7)
+                            }
+
+Para testar outros códigos o comando é:
+
+    $ comp_clojure_p3$ (teste (calc "código"))
+    
+Exemplos: 
+    Fatorial
+    
+    (teste (calc "let var z = 1 in{ let var true = 10 in {while (not(true==0)) do {z:=z*true; true:= true-1}}}"))    
+    (teste (calc "let var z = 0 in { let fn f(x, y) = z := x + y in { f(10, 20) }}"))
 
 ## Options
 
